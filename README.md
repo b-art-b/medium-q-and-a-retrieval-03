@@ -1,1 +1,3 @@
-# medium-q-and-a-retrieval-01
+# This is README for repository of the Medium article
+
+WIP

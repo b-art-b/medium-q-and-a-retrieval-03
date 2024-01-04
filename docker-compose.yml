@@ -1,0 +1,31 @@
+version: "3.7"
+
+services:
+  embed-base:
+    platform: linux/amd64
+    build:
+      context: ./embed-base
+      dockerfile: Dockerfile
+      args:
+        - IMAGE_TAG=latest
+    image: "embed-base:latest"
+
+  simple-wiki-jupyter:
+    platform: linux/amd64
+    depends_on:
+      - embed-base
+    build:
+      context: ./simple-wiki-jupyter
+      dockerfile: Dockerfile
+    image: "simple-wiki-jupyter:dev"
+    ports:
+      - "8888:8888"
+    volumes:
+      - "./mounted_dirs/models:/home/jupyter/models"
+      - "./mounted_dirs/notebooks:/home/jupyter/notebooks"
+      - "./mounted_dirs/data:/home/jupyter/data"
+  simple-wiki-jupyter-sf:
+    depends_on:
+      - simple-wiki-jupyter
+    extends: simple-wiki-jupyter
+    image: "${SF_REPO}/simple-wiki-jupyter:dev"
