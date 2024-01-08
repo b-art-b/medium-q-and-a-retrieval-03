@@ -29,3 +29,21 @@ services:
       - simple-wiki-jupyter
     extends: simple-wiki-jupyter
     image: "${SF_REPO}/simple-wiki-jupyter:dev"
+
+  simple-wiki-job:
+    depends_on:
+      - embed-base
+    platform: linux/amd64
+    build:
+      context: ./simple-wiki-job
+      dockerfile: Dockerfile
+    image: "simple-wiki-job:dev"
+    volumes:
+      - "./mounted_dirs/models:/root/models"
+      - "./mounted_dirs/data:/root/data"
+
+  simple-wiki-job-sf:
+    depends_on:
+      - simple-wiki-job
+    extends: simple-wiki-job
+    image: "${SF_REPO}/simple-wiki-job:dev"

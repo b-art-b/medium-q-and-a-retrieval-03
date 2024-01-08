@@ -1,0 +1,27 @@
+spec:
+  container:
+    - name: main
+      image: /containers_db/simple_wiki_search/images/simple-wiki-job:dev
+      volumeMounts:
+        - name: models
+          mountPath: /root/models
+        - name: data
+          mountPath: /root/data
+      resources:
+        requests:
+          nvidia.com/gpu: 4
+        limits:
+          nvidia.com/gpu: 4
+      args:
+      - "--model-name=nq-distilbert-base-v1"
+      - "--model-cache-dir=/root/models"
+      - "--data-dir=/root/data/workdir"
+      - "--embeddings-dir=/root/data/embeddings"
+      - "--save-single-pt"
+      - "--no-of-gpus=4"
+      - "--pt-file-prefix=ver1"
+  volumes:
+    - name: models
+      source: "@models"
+    - name: data
+      source: "@data"
