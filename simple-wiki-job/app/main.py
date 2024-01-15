@@ -90,6 +90,25 @@ def get_passages(wikipedia_filepath: str) -> List[Passage]:
     return passages
 
 
+def persist_transformed_passages(passages: list, passages_filepath: str):
+    try:
+        logger.info(f"Persisting passages to {passages_filepath}")
+        with gzip.open(passages_filepath, "wb") as f:
+            d = json.dumps(
+                [
+                    {
+                        "corpus_id": i,
+                        "corpus_title": passages[i][0],
+                        "corpus_text": passages[i][1],
+                    }
+                    for i in range(len(passages))
+                ],
+            )
+            f.write(d.encode("utf-8"))
+    except Exception as ex:
+        logger.warning(f"Failed to persist passages to {passages_filepath}")
+
+
 def info_on_gpu_setup():
     if not torch.cuda.is_available():
         logger.warning("No GPU found. Please add GPU to your setup.")
@@ -213,12 +232,15 @@ def run_job(
     os.makedirs(embeddings_dir, exist_ok=True)
 
     wikipedia_filepath = os.path.join(data_dir, "simplewiki-2020-11-01.jsonl.gz")
+    passages_filepath = os.path.join(data_dir, "passages-2020-11-01.json.gz")
 
     # just diplay info, no action is taken if no GPUs found.
     info_on_gpu_setup()
 
     get_simple_wikipedia_path(wikipedia_filepath)
     passages = get_passages(wikipedia_filepath)
+
+    persist_transformed_passages(passages, passages_filepath)
 
     one_model_per_gpu = get_model_per_gpu(model_cache_folder, model_name, no_of_gpus)
 

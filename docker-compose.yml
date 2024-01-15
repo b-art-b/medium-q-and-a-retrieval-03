@@ -47,3 +47,23 @@ services:
       - simple-wiki-job
     extends: simple-wiki-job
     image: "${SF_REPO}/simple-wiki-job:dev"
+
+  simple-wiki-fastapi:
+    depends_on:
+      - embed-base
+    platform: linux/amd64
+    build:
+      context: ./simple-wiki-fastapi
+      dockerfile: Dockerfile
+    image: "simple-wiki-fastapi:dev"
+    ports:
+      - "8080:80"
+    volumes:
+      - "./mounted_dirs/models:/root/models"
+      - "./mounted_dirs/data:/root/data"
+
+  simple-wiki-fastapi-sf:
+    depends_on:
+      - simple-wiki-fastapi
+    extends: simple-wiki-fastapi
+    image: "${SF_REPO}/simple-wiki-fastapi:dev"
